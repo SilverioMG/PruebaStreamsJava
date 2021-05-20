@@ -3,10 +3,12 @@ package net.atopecode.streamtest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import net.atopecode.streamtest.data.Book;
@@ -16,16 +18,25 @@ public class StreamsUnitTest {
 
 	
 	private BookRepository bookRepository;
+	private List<Book> bookList;
 	
 	public StreamsUnitTest() {
 		this.bookRepository  = new BookRepository();
+		this.bookList = new ArrayList<>();
+	}
+	
+	@BeforeEach
+	public void beforeEachTest() {
+		//Antes de cada test se refresca la lista de libros:
+		bookList = new ArrayList<Book>();
+		bookList.addAll(bookRepository.getBooks());
 	}
 
 	@Test
 	public void peek() {
 		//A diferencia de 'map()' hace algo con el objeto pero devuelve el mismo objeto, no otro tipo de dato.
 		//Con 'peek()' se realizan operaciones sobre el objeto y se devuelve. Con 'map()' se recibe un objeto y se devuelve uno de otro tipo.
-		List<Book> books = bookRepository.getBooks().stream()
+		List<Book> books = bookList.stream()
 			.peek(book -> book.setAuthor("ATopeCode"))
 			.peek(book -> System.out.println(book))
 			.collect(Collectors.toList());
@@ -33,17 +44,17 @@ public class StreamsUnitTest {
 	
 	@Test
 	public void map() {
-		List<String> titles = bookRepository.getBooks().stream()
+		List<String> titles = bookList.stream()
 				.map(book -> book.getTitle())
 				.peek(title -> System.out.println(title))
 				.collect(Collectors.toList());
 		
-		assertEquals(titles.size(), bookRepository.getBooks().size());
+		assertEquals(titles.size(), bookList.size());
 	}
 	
 	@Test
 	public void forEach() {
-		bookRepository.getBooks().stream()
+		bookList.stream()
 			.forEach(book -> {
 				double newPrice = book.getPrice();
 				newPrice *= 2;
@@ -54,13 +65,13 @@ public class StreamsUnitTest {
 	
 	@Test
 	public void mapAndForEach() {
-		List<String> titles = bookRepository.getBooks().stream()
+		List<String> titles = bookList.stream()
 				.map(book -> book.getTitle())
 				.peek(title -> System.out.println(title))
 				.collect(Collectors.toList());
 		
-		assertEquals(titles.size(), bookRepository.getBooks().size());
-		bookRepository.getBooks().forEach(
+		assertEquals(titles.size(), bookList.size());
+		bookList.forEach(
 				(book) -> {
 					assertTrue(titles.contains(book.getTitle()));
 				});
@@ -68,7 +79,7 @@ public class StreamsUnitTest {
 	
 	@Test
 	public void filter() {
-		List<Book> books = bookRepository.getBooks().stream()
+		List<Book> books = bookList.stream()
 				.filter(book -> book.getPrice() >= 15)
 				.peek(book -> System.out.println(book))
 				.collect(Collectors.toList());
@@ -78,7 +89,7 @@ public class StreamsUnitTest {
 	
 	@Test
 	public void findFirst() {
-		Book bookFirst = bookRepository.getBooks().stream()
+		Book bookFirst = bookList.stream()
 					.filter(book -> book.getPrice() >= 15)
 					.peek(System.out::println)
 					.findFirst()
@@ -94,11 +105,11 @@ public class StreamsUnitTest {
 	@Test
 	public void toArray() {
 		//Como se hacía antes de los Streams (2 formas distintas):
-		Book[] booksArray = bookRepository.getBooks().toArray(Book[]::new);
-		booksArray = bookRepository.getBooks().toArray(new Book[bookRepository.getBooks().size()]);
+		Book[] booksArray = bookList.toArray(Book[]::new);
+		booksArray = bookList.toArray(new Book[bookList.size()]);
 				
 		//Como se hace con Streams (es lo mismo pero son Streams):
-		booksArray = bookRepository.getBooks().stream().toArray(Book[]::new);
+		booksArray = bookList.stream().toArray(Book[]::new);
 		
 		//Convertimos el array en un stream para visualizar su contenido más fácilmente sin tener que utilizar el 'for(Book book: booksArray)' de toda la vida:
 		Stream.of(booksArray)
@@ -108,7 +119,7 @@ public class StreamsUnitTest {
 	
 	@Test
 	public void sorted() {
-		List<Book> books = bookRepository.getBooks().stream()
+		List<Book> books = bookList.stream()
 				.sorted((book1, book2) -> book1.getAuthor().compareToIgnoreCase(book2.getAuthor()))
 				.peek(System.out::println)
 				.collect(Collectors.toList());
@@ -117,4 +128,41 @@ public class StreamsUnitTest {
 		assertTrue(books.get(1).getAuthor().contains("José"));
 		assertTrue(books.get(2).getAuthor().contains("Luís"));
 	}
+	
+	@Test
+	public void min() {
+		Book book = bookList.stream()
+				.min((book1, book2) ->  book1.getPrice().compareTo(book2.getPrice()))
+				.orElse(null);
+						
+		System.out.println(book);
+		assertEquals(book.getPrice(), 10);
+	}
+	
+	@Test
+	public void max() {
+		Book book = bookList.stream()
+				.min((book1, book2) -> { 
+					return (-1 * book1.getPrice().compareTo(book2.getPrice()));
+				})
+				.orElse(null);
+						
+		System.out.println(book);
+		assertEquals(book.getPrice(), 50.99);
+	}
+	
+	@Test
+	public void distinct() {
+		bookList.add(new Book(bookList.get(0).getTitle(), "", 0d));
+		List<String> distinctTitles = bookList.stream()
+				.map(book -> book.getTitle())
+				.distinct()
+				.peek(System.out::println)
+				.collect(Collectors.toList());
+		
+		assertEquals(distinctTitles.size(), 3);
+	}
+	
+
+	
 }

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +32,17 @@ public class StreamsUnitTest {
 		//Antes de cada test se refresca la lista de libros:
 		bookList = new ArrayList<Book>();
 		bookList.addAll(bookRepository.getBooks());
+	}
+	
+	@Test
+	public void collect() {
+		List<Integer> listCollected = Stream.of(0, 1, 2, 3, 4, 5)
+				.collect(Collectors.toList());
+		assertTrue(listCollected.size() == 6);
+		
+		Set<String> setCollected = Stream.of("0", "0", "1", "1", "2", "2", "3", "3", "4", "4", "5", "5")
+				.collect(Collectors.toSet());
+		assertTrue(setCollected.size() == 6);
 	}
 
 	@Test

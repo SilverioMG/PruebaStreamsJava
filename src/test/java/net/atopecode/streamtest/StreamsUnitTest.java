@@ -47,8 +47,8 @@ public class StreamsUnitTest {
 
 	@Test
 	public void peek() {
-		//A diferencia de 'map()' hace algo con el objeto pero devuelve el mismo objeto, no otro tipo de dato.
-		//Con 'peek()' se realizan operaciones sobre el objeto y se devuelve. Con 'map()' se recibe un objeto y se devuelve uno de otro tipo.
+		//A diferencia de 'map()', con 'peek()' hace algo con el objeto pero devuelve el mismo objeto, no otro tipo de dato.
+		//Con 'peek()' se realizan operaciones sobre un objeto y se devuelve ese mismo objeto. Con 'map()' se recibe un objeto y se devuelve uno de otro tipo.
 		List<Book> books = bookList.stream()
 			.peek(book -> book.setAuthor("ATopeCode"))
 			.peek(book -> System.out.println(book))

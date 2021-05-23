@@ -121,7 +121,7 @@ public class StreamsUnitTest {
 		Book[] booksArray = bookList.toArray(Book[]::new);
 		booksArray = bookList.toArray(new Book[bookList.size()]);
 				
-		//Como se hace con Streams (es lo mismo pero son Streams):
+		//Como se hace con Streams (sirve para cualquier tipo de 'Collection', no solo para listas):
 		booksArray = bookList.stream().toArray(Book[]::new);
 		
 		//Convertimos el array en un stream para visualizar su contenido más fácilmente sin tener que utilizar el 'for(Book book: booksArray)' de toda la vida:

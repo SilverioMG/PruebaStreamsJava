@@ -128,6 +128,7 @@ public class StreamsUnitTest {
 		Stream.of(booksArray)
 			.peek(System.out::println)
 			.collect(Collectors.toList());
+		
 	}
 	
 	@Test
@@ -155,8 +156,8 @@ public class StreamsUnitTest {
 	@Test
 	public void max() {
 		Book book = bookList.stream()
-				.min((book1, book2) -> { 
-					return (-1 * book1.getPrice().compareTo(book2.getPrice()));
+				.max((book1, book2) -> { 
+					return (book1.getPrice().compareTo(book2.getPrice()));
 				})
 				.orElse(null);
 						
